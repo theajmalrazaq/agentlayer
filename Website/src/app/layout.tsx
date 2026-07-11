@@ -10,9 +10,13 @@ const googleSansFlex = Google_Sans_Flex({
 });
 
 export const metadata: Metadata = {
-	title: "AgentLayerWeb — The Agent Experience (AX) Framework for Dual Human-Agent Web Applications",
+	title:
+		"AgentLayerWeb — The Agent Experience (AX) Framework for Dual Human-Agent Web Applications",
 	description:
 		"An Agent Experience (AX) framework for dual human-agent web applications. Build interfaces optimized for both human visual usage and AI agent interaction.",
+	icons: {
+		icon: "/logo.svg",
+	},
 };
 
 export default function RootLayout({

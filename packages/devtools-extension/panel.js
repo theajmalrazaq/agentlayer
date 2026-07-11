@@ -112,23 +112,65 @@ function toggleOverlays() {
 	chrome.devtools.inspectedWindow.eval(
 		`(function() {
       const existing = document.querySelectorAll('.__agentlayerweb_overlay__');
-      if (existing.length) { existing.forEach(e => e.remove()); return false; }
+      if (existing.length) {
+        existing.forEach(e => e.remove());
+        if (window.__agentlayerweb_cleanup__) {
+          window.__agentlayerweb_cleanup__();
+        }
+        return false;
+      }
       const AGENT_ATTRS = ['data-agent-role','data-agent-id','data-agent-intent','data-agent-purpose','toolname','tooldescription'];
       const ROLE_COLORS = { action:'#0036fe', form:'#42c366', field:'#ecb730', navigation:'#9061ff', dialog:'#eb3424', default:'#666' };
       const selector = AGENT_ATTRS.map(a => '[' + a + ']').join(',');
-      document.querySelectorAll(selector).forEach(el => {
+      const targets = Array.from(document.querySelectorAll(selector));
+      const overlays = [];
+      
+      targets.forEach(el => {
         const role = el.getAttribute('data-agent-role') || 'default';
         const color = ROLE_COLORS[role] || ROLE_COLORS.default;
-        const rect = el.getBoundingClientRect();
         const ov = document.createElement('div');
         ov.className = '__agentlayerweb_overlay__';
-        ov.style.cssText = 'position:fixed;top:'+rect.top+'px;left:'+rect.left+'px;width:'+rect.width+'px;height:'+rect.height+'px;border:2px solid '+color+';background:'+color+'18;pointer-events:none;z-index:999999;box-sizing:border-box;';
+        ov.style.cssText = 'position:absolute;pointer-events:none;z-index:999999;box-sizing:border-box;border:2px solid '+color+';background:'+color+'18;';
         const lbl = document.createElement('div');
         lbl.style.cssText = 'position:absolute;top:-18px;left:0;background:'+color+';color:white;font-family:monospace;font-size:10px;padding:1px 5px;white-space:nowrap;';
         lbl.textContent = (el.getAttribute('data-agent-role')||'?') + ': ' + (el.getAttribute('data-agent-id')||el.getAttribute('toolname')||el.tagName.toLowerCase());
         ov.appendChild(lbl);
-        document.body.appendChild(ov);
+        document.documentElement.appendChild(ov);
+        overlays.push({ el, ov });
       });
+      
+      function updatePositions() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        overlays.forEach(({ el, ov }) => {
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) {
+            ov.style.display = 'none';
+            return;
+          }
+          ov.style.display = 'block';
+          ov.style.top = (rect.top + scrollTop) + 'px';
+          ov.style.left = (rect.left + scrollLeft) + 'px';
+          ov.style.width = rect.width + 'px';
+          ov.style.height = rect.height + 'px';
+        });
+      }
+      
+      updatePositions();
+      
+      window.addEventListener('scroll', updatePositions, { capture: true, passive: true });
+      window.addEventListener('resize', updatePositions, { passive: true });
+      
+      const observer = new MutationObserver(updatePositions);
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+      
+      window.__agentlayerweb_cleanup__ = function() {
+        window.removeEventListener('scroll', updatePositions, { capture: true });
+        window.removeEventListener('resize', updatePositions);
+        observer.disconnect();
+        delete window.__agentlayerweb_cleanup__;
+      };
+      
       return true;
     })()`,
 		(active) => {
@@ -142,13 +184,15 @@ function toggleOverlays() {
 function copyJSON() {
 	if (!currentManifest) return;
 	const btn = document.getElementById("btn-copy");
-	chrome.devtools.inspectedWindow.eval(
-		`navigator.clipboard.writeText(${JSON.stringify(JSON.stringify(currentManifest, null, 2))})`,
-		() => {
+	navigator.clipboard
+		.writeText(JSON.stringify(currentManifest, null, 2))
+		.then(() => {
 			btn.textContent = "✓ Copied!";
 			setTimeout(() => (btn.textContent = "⎘ Copy JSON"), 1500);
-		},
-	);
+		})
+		.catch((err) => {
+			console.error("Failed to copy JSON:", err);
+		});
 }
 
 document.getElementById("btn-refresh").addEventListener("click", scanPage);

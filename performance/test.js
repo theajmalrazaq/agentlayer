@@ -5,7 +5,10 @@ import { chromium } from "playwright";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ListToolsRequestSchema,
+	CallToolRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,12 +18,12 @@ const humanUrl = "https://theajmalrazaq.github.io/agentlayerweb/example/human";
 const agentUrl =
 	"https://theajmalrazaq.github.io/agentlayerweb/example/agentlayerweb";
 
-async function sleep(ms) {
+async function _sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Estimate tokens (1 token ≈ 4 characters)
-function estimateTokens(text) {
+function _estimateTokens(text) {
 	return Math.ceil(text.length / 4);
 }
 
@@ -107,7 +110,10 @@ async function callDirectAPI(model, system, messages, tools) {
 					openaiMessages.push({ role: "assistant", content: text });
 				}
 			} else if (msg.role === "user") {
-				if (Array.isArray(msg.content) && msg.content[0]?.type === "tool_result") {
+				if (
+					Array.isArray(msg.content) &&
+					msg.content[0]?.type === "tool_result"
+				) {
 					const toolResult = msg.content[0];
 					openaiMessages.push({
 						role: "tool",
@@ -117,7 +123,10 @@ async function callDirectAPI(model, system, messages, tools) {
 				} else {
 					openaiMessages.push({
 						role: "user",
-						content: typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content),
+						content:
+							typeof msg.content === "string"
+								? msg.content
+								: JSON.stringify(msg.content),
 					});
 				}
 			}
@@ -160,7 +169,7 @@ async function callDirectAPI(model, system, messages, tools) {
 					typeof call.function.arguments === "string"
 						? JSON.parse(call.function.arguments)
 						: call.function.arguments;
-			} catch (err) {
+			} catch (_err) {
 				// ignore
 			}
 			content.push({
@@ -197,13 +206,15 @@ async function runScenario1Human(modelName) {
 
 	const client = new Client(
 		{ name: "playwright-benchmark-client", version: "1.0.0" },
-		{ capabilities: {} }
+		{ capabilities: {} },
 	);
 
 	try {
 		await client.connect(transport);
 	} catch (err) {
-		console.error(`   ❌ Failed to connect to Playwright MCP server: ${err.message}`);
+		console.error(
+			`   ❌ Failed to connect to Playwright MCP server: ${err.message}`,
+		);
 		throw err;
 	}
 
@@ -213,7 +224,9 @@ async function runScenario1Human(modelName) {
 		const toolsResponse = await client.listTools();
 		mcpTools = toolsResponse.tools || [];
 	} catch (err) {
-		console.error(`   ❌ Failed to list tools from Playwright MCP server: ${err.message}`);
+		console.error(
+			`   ❌ Failed to list tools from Playwright MCP server: ${err.message}`,
+		);
 		await client.close();
 		throw err;
 	}
@@ -225,8 +238,7 @@ async function runScenario1Human(modelName) {
 		input_schema: t.inputSchema,
 	}));
 
-	const systemPrompt =
-		`You are an AI web automation assistant using the Playwright MCP server. Your goal is to add a new client entity. First, navigate to the target page using 'browser_navigate' with the URL: ${humanUrl}. Then take a snapshot using 'browser_snapshot' or use selectors to inspect the page. Fill the Company Legal Name with 'error', fill the Billing Email with 'test@example.com', select 'Enterprise Tier' as the Billing Tier, check the 'Enable Auto-Charge billing sweeps' checkbox, and click the 'Create client profile' button. If there is a validation error, clear/change the Company Legal Name to 'Acme Corp' and submit again. Once the confirmation modal appears, click Confirm. Verify success.`;
+	const systemPrompt = `You are an AI web automation assistant using the Playwright MCP server. Your goal is to add a new client entity. First, navigate to the target page using 'browser_navigate' with the URL: ${humanUrl}. Then take a snapshot using 'browser_snapshot' or use selectors to inspect the page. Fill the Company Legal Name with 'error', fill the Billing Email with 'test@example.com', select 'Enterprise Tier' as the Billing Tier, check the 'Enable Auto-Charge billing sweeps' checkbox, and click the 'Create client profile' button. If there is a validation error, clear/change the Company Legal Name to 'Acme Corp' and submit again. Once the confirmation modal appears, click Confirm. Verify success.`;
 
 	const messages = [
 		{
@@ -248,12 +260,7 @@ async function runScenario1Human(modelName) {
 
 		let result;
 		try {
-			result = await callDirectAPI(
-				modelName,
-				systemPrompt,
-				messages,
-				tools,
-			);
+			result = await callDirectAPI(modelName, systemPrompt, messages, tools);
 		} catch (err) {
 			console.error(`   ❌ API call failed: ${err.message}`);
 			break;
@@ -324,11 +331,12 @@ async function runScenario1Human(modelName) {
 			const evalResult = await client.callTool({
 				name: "browser_evaluate",
 				arguments: {
-					function: "() => document.querySelector('#toast-notify-status')?.textContent || ''",
+					function:
+						"() => document.querySelector('#toast-notify-status')?.textContent || ''",
 				},
 			});
 			successText = evalResult.content?.[0]?.text || "";
-		} catch (err) {
+		} catch (_err) {
 			// ignore eval errors
 		}
 
@@ -342,7 +350,7 @@ async function runScenario1Human(modelName) {
 
 	try {
 		await client.close();
-	} catch (err) {
+	} catch (_err) {
 		// ignore
 	}
 
@@ -443,7 +451,7 @@ async function runScenario2Agent(modelName, browser) {
 	// Create real MCP Server for Scenario 2 semantic tools
 	const server = new Server(
 		{ name: "agentlayerweb-semantic-mcp", version: "1.0.0" },
-		{ capabilities: { tools: {} } }
+		{ capabilities: { tools: {} } },
 	);
 
 	server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -491,10 +499,7 @@ async function runScenario2Agent(modelName, browser) {
 				});
 				toolResult = JSON.stringify(state);
 			} else if (name === "create_client_profile") {
-				await page.fill(
-					"[data-agent-field='company_name']",
-					args.companyName,
-				);
+				await page.fill("[data-agent-field='company_name']", args.companyName);
 				await page.fill(
 					"[data-agent-field='billing_email']",
 					args.billingEmail,
@@ -531,10 +536,11 @@ async function runScenario2Agent(modelName, browser) {
 	});
 
 	// Create linked pair of transports and connect client/server in-memory
-	const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+	const [clientTransport, serverTransport] =
+		InMemoryTransport.createLinkedPair();
 	const client = new Client(
 		{ name: "semantic-mcp-client", version: "1.0.0" },
-		{ capabilities: {} }
+		{ capabilities: {} },
 	);
 
 	await Promise.all([
@@ -548,7 +554,9 @@ async function runScenario2Agent(modelName, browser) {
 		const toolsResponse = await client.listTools();
 		mcpTools = toolsResponse.tools || [];
 	} catch (err) {
-		console.error(`   ❌ Failed to list tools from semantic MCP server: ${err.message}`);
+		console.error(
+			`   ❌ Failed to list tools from semantic MCP server: ${err.message}`,
+		);
 		await client.close();
 		await page.close();
 		throw err;
@@ -583,12 +591,7 @@ async function runScenario2Agent(modelName, browser) {
 
 		let result;
 		try {
-			result = await callDirectAPI(
-				modelName,
-				systemPrompt,
-				messages,
-				tools,
-			);
+			result = await callDirectAPI(modelName, systemPrompt, messages, tools);
 		} catch (err) {
 			console.error(`   ❌ API call failed: ${err.message}`);
 			break;
@@ -668,7 +671,7 @@ async function runScenario2Agent(modelName, browser) {
 
 	try {
 		await client.close();
-	} catch (err) {
+	} catch (_err) {
 		// ignore
 	}
 	await page.close();
@@ -690,21 +693,22 @@ async function main() {
 
 	// Verify environment variables are present
 	if (!process.env.OPENAI_API_KEY) {
-		console.error("❌ Error: OPENAI_API_KEY environment variable is not defined.");
+		console.error(
+			"❌ Error: OPENAI_API_KEY environment variable is not defined.",
+		);
 		process.exit(1);
 	}
 	if (!process.env.ANTHROPIC_API_KEY) {
-		console.error("❌ Error: ANTHROPIC_API_KEY environment variable is not defined.");
+		console.error(
+			"❌ Error: ANTHROPIC_API_KEY environment variable is not defined.",
+		);
 		process.exit(1);
 	}
 
 	console.log("Detected API Keys for OpenAI and Anthropic.");
 
 	// Models to benchmark
-	const targetModels = [
-		"claude-haiku-4-5",
-		"gpt-4o-mini",
-	];
+	const targetModels = ["claude-haiku-4-5", "gpt-4o-mini"];
 
 	// Launch Playwright Chromium (used for Scenario 2)
 	const browser = await chromium.launch({ headless: false });
@@ -726,15 +730,22 @@ async function main() {
 				agentRes.inputTokens * COST_PER_INPUT_TOKEN +
 				agentRes.outputTokens * COST_PER_OUTPUT_TOKEN;
 
-			const speedup = (humanRes.success && agentRes.success)
-				? (humanRes.duration / agentRes.duration).toFixed(2)
-				: 0;
-			const tokenSavings = (humanRes.success && agentRes.success)
-				? (((humanRes.inputTokens - agentRes.inputTokens) / humanRes.inputTokens) * 100).toFixed(1)
-				: "0";
-			const costSavings = (humanRes.success && agentRes.success)
-				? (((humanCost - agentCost) / humanCost) * 100).toFixed(1)
-				: "0";
+			const speedup =
+				humanRes.success && agentRes.success
+					? (humanRes.duration / agentRes.duration).toFixed(2)
+					: 0;
+			const tokenSavings =
+				humanRes.success && agentRes.success
+					? (
+							((humanRes.inputTokens - agentRes.inputTokens) /
+								humanRes.inputTokens) *
+							100
+						).toFixed(1)
+					: "0";
+			const costSavings =
+				humanRes.success && agentRes.success
+					? (((humanCost - agentCost) / humanCost) * 100).toFixed(1)
+					: "0";
 
 			results[modelName] = {
 				human: {
@@ -772,7 +783,9 @@ async function main() {
 	console.log(
 		"\n=============================================================================================================",
 	);
-	console.log("                                        CONSOLIDATED COMPARATIVE RESULTS");
+	console.log(
+		"                                        CONSOLIDATED COMPARATIVE RESULTS",
+	);
 	console.log(
 		"=============================================================================================================",
 	);
@@ -785,7 +798,7 @@ async function main() {
 			" | " +
 			String.prototype.padEnd.call("Speedup", 8) +
 			" | " +
-			"Tok. Save"
+			"Tok. Save",
 	);
 	console.log("-".repeat(122));
 	for (const m of Object.keys(results)) {

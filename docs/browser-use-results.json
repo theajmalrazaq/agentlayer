@@ -1,44 +1,44 @@
 {
-  "claude-haiku-4-5": {
-    "human": {
-      "success": false,
-      "duration": "76.11",
-      "steps": 12,
-      "tokens": 135110,
-      "cost": "0.010633"
-    },
-    "agent": {
-      "success": true,
-      "duration": "34.71",
-      "steps": 8,
-      "tokens": 13346,
-      "cost": "0.001309"
-    },
-    "comparison": {
-      "speedup": "N/A",
-      "tokenSavings": "N/A",
-      "costSavings": "N/A"
-    }
-  },
-  "gpt-4o-mini": {
-    "human": {
-      "success": false,
-      "duration": "52.33",
-      "steps": 11,
-      "tokens": 65468,
-      "cost": "0.005087"
-    },
-    "agent": {
-      "success": true,
-      "duration": "15.49",
-      "steps": 6,
-      "tokens": 2807,
-      "cost": "0.000260"
-    },
-    "comparison": {
-      "speedup": "N/A",
-      "tokenSavings": "N/A",
-      "costSavings": "N/A"
-    }
-  }
+	"claude-haiku-4-5": {
+		"human": {
+			"success": false,
+			"duration": "76.11",
+			"steps": 12,
+			"tokens": 135110,
+			"cost": "0.010633"
+		},
+		"agent": {
+			"success": true,
+			"duration": "34.71",
+			"steps": 8,
+			"tokens": 13346,
+			"cost": "0.001309"
+		},
+		"comparison": {
+			"speedup": "N/A",
+			"tokenSavings": "N/A",
+			"costSavings": "N/A"
+		}
+	},
+	"gpt-4o-mini": {
+		"human": {
+			"success": false,
+			"duration": "52.33",
+			"steps": 11,
+			"tokens": 65468,
+			"cost": "0.005087"
+		},
+		"agent": {
+			"success": true,
+			"duration": "15.49",
+			"steps": 6,
+			"tokens": 2807,
+			"cost": "0.000260"
+		},
+		"comparison": {
+			"speedup": "N/A",
+			"tokenSavings": "N/A",
+			"costSavings": "N/A"
+		}
+	}
 }

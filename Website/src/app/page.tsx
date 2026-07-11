@@ -266,8 +266,8 @@ export default function Home() {
 
 					<p className="text-body-x-large text-accent-black/70 max-w-640 mx-auto mb-32">
 						An Agent Experience (AX) framework for dual human-agent web
-						applications. Build interfaces optimized for both human visual
-						usage and AI agent interaction.
+						applications. Build interfaces optimized for both human visual usage
+						and AI agent interaction.
 					</p>
 
 					{/* Search Bar Mockup */}

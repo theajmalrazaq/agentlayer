@@ -1,0 +1,10 @@
+<svg width="61" height="67" viewBox="0 0 61 67" fill="none" xmlns="http://www.w3.org/2000/svg">
+<title>AgentLayerWeb logo</title>
+<path d="M20 22H12V55H55V67H0V10H20V22ZM32 37H43V49H20V22H32V37ZM43.5 0C43.9203 8.94373 51.1001 16.0862 60.0459 16.46L61 16.5L60.0459 16.54C51.1001 16.9138 43.9203 24.0563 43.5 33C43.0797 24.0563 35.8999 16.9138 26.9541 16.54L26 16.5L26.9541 16.46C35.8999 16.0862 43.0797 8.94373 43.5 0Z" fill="url(#paint0_linear_585_1265)"/>
+<defs>
+<linearGradient id="paint0_linear_585_1265" x1="43.5" y1="0" x2="43.5" y2="33" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0036FE"/>
+<stop offset="1" stop-opacity="0.81"/>
+</linearGradient>
+</defs>
+</svg>

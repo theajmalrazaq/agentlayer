@@ -13,6 +13,25 @@ const AGENT_ATTRS = [
 
 let overlaysEnabled = false;
 let overlayElements = [];
+let overlayMapping = [];
+let overlayObserver = null;
+
+function updateOverlayPositions() {
+	const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+	overlayMapping.forEach(({ el, overlay }) => {
+		const rect = el.getBoundingClientRect();
+		if (rect.width === 0 && rect.height === 0) {
+			overlay.style.display = "none";
+			return;
+		}
+		overlay.style.display = "block";
+		overlay.style.top = `${rect.top + scrollTop}px`;
+		overlay.style.left = `${rect.left + scrollLeft}px`;
+		overlay.style.width = `${rect.width}px`;
+		overlay.style.height = `${rect.height}px`;
+	});
+}
 
 /**
  * Scans the DOM and returns a structured manifest of all AgentLayerWeb elements
@@ -70,16 +89,11 @@ function enableOverlays() {
 	elements.forEach((el) => {
 		const role = el.getAttribute("data-agent-role") || "default";
 		const color = roleColors[role] || roleColors.default;
-		const rect = el.getBoundingClientRect();
 
 		const overlay = document.createElement("div");
 		overlay.className = "__agentlayerweb_overlay__";
 		overlay.style.cssText = `
-      position: fixed;
-      top: ${rect.top}px;
-      left: ${rect.left}px;
-      width: ${rect.width}px;
-      height: ${rect.height}px;
+      position: absolute;
       border: 2px solid ${color};
       background: ${color}18;
       pointer-events: none;
@@ -104,8 +118,24 @@ function enableOverlays() {
 		label.textContent = `${role}: ${el.getAttribute("data-agent-id") || el.getAttribute("toolname") || el.tagName.toLowerCase()}`;
 		overlay.appendChild(label);
 
-		document.body.appendChild(overlay);
+		document.documentElement.appendChild(overlay);
 		overlayElements.push(overlay);
+		overlayMapping.push({ el, overlay });
+	});
+
+	updateOverlayPositions();
+
+	window.addEventListener("scroll", updateOverlayPositions, {
+		capture: true,
+		passive: true,
+	});
+	window.addEventListener("resize", updateOverlayPositions, { passive: true });
+
+	overlayObserver = new MutationObserver(updateOverlayPositions);
+	overlayObserver.observe(document.body, {
+		attributes: true,
+		childList: true,
+		subtree: true,
 	});
 }
 
@@ -114,7 +144,18 @@ function removeOverlays() {
 		el.remove();
 	});
 	overlayElements = [];
+	overlayMapping = [];
 	overlaysEnabled = false;
+
+	window.removeEventListener("scroll", updateOverlayPositions, {
+		capture: true,
+	});
+	window.removeEventListener("resize", updateOverlayPositions);
+
+	if (overlayObserver) {
+		overlayObserver.disconnect();
+		overlayObserver = null;
+	}
 }
 
 // Listen for messages from devtools panel

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AgentLayerWeb DevTools</title>
+  <style>
+    body {
+      width: 280px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f0f10;
+      color: #e8e8e8;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .logo-img {
+      width: 22px;
+      height: 24px;
+      display: block;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #0036fe;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #222, transparent);
+      margin: 14px 0;
+    }
+    .instructions {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #aaa;
+      text-align: left;
+      background: #161618;
+      border: 1px solid #222;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .step {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .step:last-child {
+      margin-bottom: 0;
+    }
+    .step-number {
+      background: #0036fe22;
+      color: #0036fe;
+      border: 1px solid #0036fe44;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 11px;
+    }
+    .footer {
+      font-size: 10px;
+      color: #555;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img class="logo-img" src="logo.svg" alt="AgentLayerWeb logo" />
+    <h1 class="title">AgentLayerWeb</h1>
+  </div>
+  <div class="subtitle">DevTools Extension</div>
+  
+  <div class="instructions">
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-text">Open developer tools (Press <strong>F12</strong> or <strong>Ctrl+Shift+I</strong> / <strong>Cmd+Option+I</strong>).</span>
+    </div>
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-text">Select the <strong>⬡ AgentLayerWeb</strong> tab.</span>
+    </div>
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-text">Click <strong>Scan</strong> to inspect annotated elements on the page!</span>
+    </div>
+  </div>
+  
+  <div class="divider"></div>
+  <div class="footer">v0.1.0 • Agent-Native Web UI</div>
+</body>
+</html>
